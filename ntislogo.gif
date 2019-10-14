@@ -1,0 +1,1292 @@
+
+
+
+
+
+
+
+
+
+<!doctype html>
+<html lang="ko">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>홈 > 통합검색 > 과제상세조회</title>
+
+<link type="text/css" rel="stylesheet" href="/sims/common/css/pjtInfo/ntisglobal.css">
+<link type="text/css" rel="stylesheet" href="/sims/common/css/pjtInfo/result_view2017.css">
+
+<!-- <link type="text/css" rel="stylesheet" href="/common/css/th/2014/reset2014.css" /> -->
+<!-- <link type="text/css" rel="stylesheet" href="/common/css/th/2014/layout2014.css" /> -->
+<!-- <link type="text/css" rel="stylesheet" href="/common/css/2015/pageing.css" /> -->
+<!-- <link type="text/css" rel="stylesheet" href="/common/css/th/2014/table2014.css" /> -->
+<!-- <link type="text/css" rel="stylesheet" href="/common/css/th/2014/globalsearch2014.css" /> -->
+<!-- <link type="text/css" rel="stylesheet" href="/common/css/th/2014/search2014.css" /> -->
+<!-- <link type="text/css" rel="stylesheet" href="/common/css/th/2014/result_view2014.css" /> -->
+<link type="text/css" href="/sims/common/css/th/2014/btn2014.css" rel="stylesheet" />
+<link type="text/css" href="/sims/common/css/th/2014/tab2014.css" rel="stylesheet" />
+<link type="text/css" href="/sims/common/css/th/2014/jquery-ui-1.11.1.min.css" rel="stylesheet"/>
+<link type="text/css" href="https://www.ntis.go.kr/include/css/jalert/jquery.alerts.css" rel="stylesheet" />
+
+<style type="text/css">
+	#paging strong{
+		font-family:Verdana;
+		color:#555;
+		font-size:13px;
+		font-weight:700;
+		text-decoration:none;
+		border:1px solid #fff;
+		line-height:18px;
+		height:28px;
+		padding:4px 8px;
+		display:inline-block;
+		vertical-align:top;
+	}
+	input[type=button] {height:40px !important; line-height:1em !important;}
+</style>
+<script type="text/javascript" src="/sims/common/js/th/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="/sims/common/js/th/jquery-ui-1.11.1.min.js"></script>
+<script type="text/javascript" src="/sims/common/js/th/jquery.popupoverlay.js"></script>
+<script type="text/javascript" src="/sims/common/js/th/placeholders.min.js"></script>
+<script src="/sims/common/js/pjtInfo/include/html5shiv.min.js"></script>
+<script type="text/javascript" src="/sims/common/ajax.js"></script>
+
+<!-- JConfirm -->
+<script src="https://www.ntis.go.kr/include/js/jquery.alerts.js" type="text/javascript" charset="euc-kr"></script>
+
+<script type="text/javascript">
+//<![CDATA[
+	// 팝업 창 여부
+	var openPopYn = "N";
+	if(window.opener){
+		openPopYn = "Y";
+	}
+
+	var returnURI = '';
+	
+	//var dcReturnURI = '';
+	var dcReturnURI = fnDecodeUrl(returnURI);
+
+	
+
+	
+		var secPjtYn = 'N';
+		if(secPjtYn == "Y"){
+			alert("보안과제는 서비스가 제한됩니다.");
+	
+			if(openPopYn == "Y"){
+				window.close();
+			}else{
+				if (document.referrer && document.referrer.indexOf("ntis.go.kr") != -1){ 
+					history.back();
+				}else { 
+					location.href = 'https://www.ntis.go.kr';
+				}
+			}
+		}
+	
+		var loginId = '';
+		// 로그인 여부 확인
+		if(loginId == null || loginId == ""){
+			//alert("로그인 후 사용할 수 있습니다.");
+
+			fnLogin();
+		}
+	
+
+	var prtcpList;
+	var gPrtcpCnt = 0;
+	
+	var menuYn = "Y";
+	var loginWin;
+	
+	var pjtId = '1711019127';
+	var gBzClasCd = '23402';
+	var confViewYn = '';
+	
+	/**
+	 * 문자열 공백 제거
+	 * @returns공백 제거 문자열
+	 */
+	String.prototype.trim = function() { 
+		return this.replace(/^\s+|\s+$/g, '');
+	};
+	
+	function fnDecodeUrl(input){
+		var _keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+		var output = "";
+		var chr1, chr2, chr3;
+		var enc1, enc2, enc3, enc4;
+		var i = 0;
+	
+		input = input.replace(/[^A-Za-z0-9+/=]/g, "");
+	
+		while (i < input.length){
+			enc1 = _keyStr.indexOf(input.charAt(i++));
+			enc2 = _keyStr.indexOf(input.charAt(i++));
+			enc3 = _keyStr.indexOf(input.charAt(i++));
+			enc4 = _keyStr.indexOf(input.charAt(i++));
+	
+			chr1 = (enc1 << 2) | (enc2 >> 4);
+			chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+			chr3 = ((enc3 & 3) << 6) | enc4;
+	
+			output = output + String.fromCharCode(chr1);
+	
+			if (enc3 != 64) {
+				output = output + String.fromCharCode(chr2);
+			}
+			if (enc4 != 64) {
+				output = output + String.fromCharCode(chr3);
+			}
+		}
+	
+		return output;
+	}
+
+	function fnPrtcpView(openYn, hmMgntNo){
+		var userId = $("#userId").val();
+	
+		if(userId == ""){
+			alert("로그인이 필요합니다.");
+			return false;
+		}
+	
+		// 운영버전 URL 변경
+		// 2015.06.08 박찬일 - 공개/비공개 여부에 관계없이 링크 연결
+		// 2017.10.24 박찬일 - 공개/비공개 구분(개발실 박민우 실장 요청)
+		// 2018.01.28 박찬일 - 공개/비공개 여부에 관계없이 링크 연결
+		/*
+		if(openYn == "공개"){
+			// 운영버전 URL 변경
+			var url = "https://www.ntis.go.kr/hurims/detail/selectDetailInfo.do?hrstKOI=" + hmMgntNo;
+			url += "&apiGb=true&pjtId="+'1711019127';
+			url += "&returnURI=" + '';
+	
+			window.location.href = url;
+		}else{
+			alert("해당 인력은 비공개입니다.");
+			return false;
+		}
+		*/
+		
+		// 2018.05.10 - 인력관리번호가 없는 경우 링크 제외
+		if(hmMgntNo != null && hmMgntNo != ""){
+			var url = "https://www.ntis.go.kr/hurims/detail/selectDetailInfo.do?hrstKOI=" + hmMgntNo;
+			url += "&apiGb=true&pjtId="+'1711019127';
+			url += "&returnURI=" + '';
+		
+			// 2018.02.21 kh - 팝업으로 변경 요청 적용
+	// 		window.location.href = url;
+			window.open(url,"prtcpView","top=0,left=0,width=1200,height=700,scrollbars=yes,resizable=yes");
+		}
+	}
+
+	function Lpad(str, num, chr) {   
+	    if (! str || str.length >= num) {
+	        return str;
+	    }
+	
+	    var max = num - str.length;
+	    for (var i = 0; i < max; i++) {
+	        str = chr + str;
+	    }
+	
+	    return str;
+	}
+
+
+	// 성과 리스트 가져오기
+	function getOutcomeList(req){
+		if(req.readyState==4){
+			if(req.status==200){
+				var html = req.responseText;
+				if(html != ""){						
+					$('#divOutcomeList').html(html);
+
+					// 성과 목록 조회 부분 디자인 변경
+					$("#outCommonDiv div div p").attr("style", "font-size: 0.87rem;");
+				}
+			}else{
+				//alert("로딩 실패 : \n" + req.status);
+			}
+		}
+	}
+	
+	// 과제 상세정보 조회
+	function pjtView(){
+		$("#divMain").attr("style", "display:");
+	
+		$("#divConfPjtInfo").attr("style", "display:none");
+		$("#divSummary").attr("style", "display:none");
+		$("#divPrtcp").attr("style", "display:none");
+		$("#divFner").attr("style", "display:none");
+	
+		$("#sPjtView").attr("class", "v_tab info01 on");
+		
+		$("#sPjtConfView").attr("class", "v_tab info02");
+		$("#sSummaryView").attr("class", "v_tab info03");
+		$("#sPrtcpView").attr("class", "v_tab info04");
+		$("#sFnerView").attr("class", "v_tab info05");
+	}
+	
+	// 과제 구성정보 조회
+	function pjtConfView(){
+		$("#divConfPjtInfo").attr("style", "display:;min-height:420px;");
+		
+		$("#divMain").attr("style", "display:none");
+		$("#divSummary").attr("style", "display:none");
+		$("#divPrtcp").attr("style", "display:none");
+		$("#divFner").attr("style", "display:none");
+	
+		$("#sPjtConfView").attr("class", "v_tab info02 on");
+	
+		$("#sPjtView").attr("class", "v_tab info01");
+		$("#sSummaryView").attr("class", "v_tab info03");
+		$("#sPrtcpView").attr("class", "v_tab info04");
+		$("#sFnerView").attr("class", "v_tab info05");
+	}
+
+	// 글로벌 메뉴 가져오기
+	function getGlobalMenuList(req){
+		if(req.readyState==4){
+			if(req.status==200){
+				var $ojbGlobalMenuLayer = $('#globalMenuLayer');
+				if(req.responseText != ""){
+					$('#globalMenuLayer').html(req.responseText);
+					$('#globalMenuLayer').show();
+					$(".appgroup").css("display", "");
+				}
+			}
+		}
+	}
+
+	// 사용자 메뉴 가져오기
+	function getUserMenuList(req){
+		if(req.readyState==4){
+			if(req.status==200){
+				if(req.responseText != ""){
+					$('#globalUserMenuLayer').html(req.responseText);
+					$('#globalUserMenuLayer').show();
+					$(".userinfogroup").css("display", "");
+				}
+			}
+		}
+	}
+
+	// 로그인
+	function fnLogin() {
+		var width = 450;
+		var height = 450;
+	
+		var url = "/sims/initech/sso/utf8/ssoPopupPjtLogin.jsp?decorator=popup";
+		url += "&pjtId="+'1711019127';
+		url += "&confViewYn="+'';
+	
+		var winfeatures = "toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=no,width="+width+",height="+height;
+		
+		if( loginWin != null ) {
+			loginWin.close();
+			loginWin = null;
+		}
+	
+		loginWin = window.open(url, "loginWin", winfeatures);
+	}
+
+	// 사업정보 팝업
+	function openWinBzInfo(){
+		var userId = $("#userId").val();
+	
+		if(userId == ""){
+			fnLogin();
+			return false;
+		}
+		
+		var w = 1280;
+		var h = 800;
+		
+		var cw = w;
+		var ch = h;
+		
+		sw = screen.availWidth;
+		sh = screen.availHeight;
+		
+		px = (sw-cw)/2;
+		py = (sh-ch)/2;
+		
+		$("#bz_id").val('M3A9A4');
+		$("#bz_yy").val('2014');
+		
+		var bzPop = window.open("", "bzInfoWin", "left="+px+", top="+py+", width="+cw+", height="+ch+", scrollbars=yes, status=no, menu=yes, resizable=yes");
+		
+		var f = document.fmBzInfo;
+		
+		// 시범운영 버전
+		//f.action = "http://rndgate.ntis.go.kr/cm/login/login_outLink.jsp";
+		f.action = "https://www.ntis.go.kr/rndgate/cm/login/login_outLink.jsp";
+		
+		f.target = "bzInfoWin";
+		
+		bzPop.focus();
+		
+		f.submit();
+	}
+
+	function openWinResize(url, w, h){
+		cw = w;
+		ch = h;
+		
+		sw = screen.availWidth;
+		sh = screen.availHeight;
+		
+		px = (sw-cw)/2;
+		py = (sh-ch)/2;
+		
+		window.open(url, "", "scrollbars=yes, status=no, menu=yes, resizable=yes, left="+px+", top="+py+", width="+cw+", height="+ch)
+	}
+
+	// 계속 과제 목록 조회
+	function getContPjtList(pjtId){
+		var url="/sims/exclude/retrieveContPjtHtml.do";
+		var params = "pjtInfoVo.pjtId="+pjtId;
+	
+	    $.ajax({
+	        type:"POST",  
+	        url:url,      
+	        data:params,		
+	        success:function(args){
+	        	$("#divContPjtList").html(args);
+	        },
+	        error:function(e){  
+	            alert(e.responseText);
+	        }  
+	    });
+	}
+	
+	// 동일 연구책임자 수행과제 내역
+	function getPrtcpPjtList(pjtId){
+		var url="/sims/exclude/retrievePrtcpPjtHtml.do";
+		var params = "pjtInfoVo.pjtId="+pjtId;
+	
+	    $.ajax({
+	        type:"POST",  
+	        url:url,      
+	        data:params,      
+	        success:function(args){
+	        	$("#divPrtcpPjtList").html(args);
+	        },
+	        error:function(e){  
+	            alert(e.responseText);
+	        }  
+	    });
+	}
+	
+	// 정보 변경 이력 조회
+	function getChngHistList(pjtId){
+		var url="/sims/exclude/retrieveChngHist.do";
+		var params = "pjtInfoVo.pjtId="+pjtId;
+	
+	    $.ajax({
+	        type:"POST",  
+	        url:url,      
+	        data:params,      
+	        success:function(args){
+	        	$("#changePopup").html(args);
+	        },
+	        error:function(e){  
+	            alert(e.responseText);
+	        }  
+	    });
+	}
+	
+	// 조사분석성과현황
+	function rstTabInfolink(num, tabGb){
+		var params = "pjtInfoVo.pjtId="+'1711019127';
+		params += "&tabGb="+tabGb;
+	
+		new ajax.xhr.Request("/sims/exclude/retrieveOutcomeList.do",params,getOutcomeList, "POST");
+	}
+	
+	// 성과 리스트 탭 이동
+	function rstInfoCnt(num){
+		var params = "pjtInfoVo.pjtId="+'1711019127';
+		params += "&num="+num;
+	
+		new ajax.xhr.Request("/sims/exclude/retrieveOutcomeList.do",params,getOutcomeList, "POST");
+	}
+	
+	// 성과 리스트 페이지 이동
+	function srchList(num){
+		var params = "pjtInfoVo.pjtId="+'1711019127';
+		params += "&pageNo="+num;
+		params += "&num=" + $("#rstGb").val();
+		
+		//params += "&num=0";
+		//alert(params);
+	
+		new ajax.xhr.Request("/sims/exclude/retrieveOutcomeList.do",params,getOutcomeList, "POST");
+	}
+	
+	// 성과 조회 화면
+	function rstInfoUrl(sUrl){
+		// 운영버전 URL 변경
+		//sUrl = sUrl.replace("srch", "popup");
+		// 시범운영버전 URL
+		// parent.location.href = "http://roots.ntis.go.kr/popup" + sUrl  + "&returnURI=" + '';
+		parent.location.href = "https://www.ntis.go.kr/outcomes/popup" + sUrl  + "&returnURI=" + '';
+	}
+	
+	// 성과 원문
+	function openRefWin(rstRefId){
+		// 운영버전 URL 변경
+		var rstGb = $("#rstGb").val();
+	
+		if($("#rstGb").val().length < 2){
+			rstGb = "0" + rstGb;
+		}
+		// 시범운영버전 URL
+		//window.open("http://roots.ntis.go.kr/popup/showOriginal.jsp?rstCd="+rstGb+"&rstId="+rstRefId+"&rstDiv=1","popup","top=0,left=0,width=1270,height=700,scrollbars=yes,resizable=yes");
+		window.open("https://www.ntis.go.kr/outcomes/popup/showOriginal.jsp?rstCd="+rstGb+"&rstId="+rstRefId+"&rstDiv=1","popup","top=0,left=0,width=1270,height=700,scrollbars=yes,resizable=yes");
+	}
+
+	// 이전과제 및 후속과제 조회
+	function goPjtView(pjtId){
+		var url = "/sims/pjtinfo/pjtMainInfo.do?pjtInfoVo.pjtId=" + pjtId + "&returnURI=" + '';
+
+		location.href = url;
+	}
+	
+	// 과제맵 팝업
+	function fnPjtNtisMap(pjtId){
+		var url = "http://rndnavi.kisti.re.kr/ntis/map/d3RelatedProjectManager.do?idx="+pjtId+"&score=0.5";
+		openPopUpWin(url, 1058, 618, "과제맵");
+	}
+
+	// 연구자맵 팝업
+	function fnPrtcpNtisMap(pjtId, hmNm, hmId, orgNm){
+		var url = "http://rndnavi.kisti.re.kr/ntis/map/authorKnowledgeMap.do?idx="+pjtId;
+		url += "&author=" + hmNm;
+		url += "&hmId=" + hmId;
+		url += "&orgNm="+ orgNm;
+		openPopUpWin(url, 942, 543, "연구자맵");
+	}
+	
+	// 연구기관맵 팝업
+	function fnOrgMap(pjtId, orgNm){
+		var url = "http://rndnavi.kisti.re.kr/ntis/map/orgKnowledgeMap.do?idx="+pjtId+"&orgNm="+orgNm;
+		openPopUpWin(url, 942, 511, "연구기관맵");
+	}
+	
+	// 주제맵 팝업
+	function fnKwdMap(kwd){
+		var url = "http://rndnavi.kisti.re.kr/ntis/map/topicKnowledgeMap.do?keyword="+kwd;
+		openPopUpWin(url, 942, 526, "주제맵");
+	}
+	
+	// 팝업 오픈
+	function openPopUpWin(url, w, h, popName){
+		cw = w;
+		ch = h;
+		
+		sw = screen.availWidth;
+		sh = screen.availHeight;
+		
+		px = (sw-cw)/2;
+		py = (sh-ch)/2;
+		
+		window.open(url, popName, "scrollbars=no, status=no, menu=no, resizable=no, left="+px+", top="+py+", width="+cw+", height="+ch);
+	}
+	
+	// This is a click function outside the app menu area.
+// 	$("body").click(function(e) {
+// 		var amg = $(".appgroup").css("display") == "block";
+// 		var uig = $(".userinfogroup").css("display") == "block";
+// 		if (amg || uig) {
+// 			if (!$(".appgroup").has(e.target).length) {
+// 				$(".appgroup").slideUp(300);
+// 				$(".appmenu").removeClass("act");
+// 			}
+// 			if (!$(".userinfogroup").has(e.target).length) {
+// 				$(".userinfogroup").slideUp(300);
+// 				$(".u_arrow").removeClass("act");
+// 			}
+// 		}
+// 	});
+	
+//]]>
+
+	$(document).ready(function(){
+		if(confViewYn == "Y"){
+			pjtConfView();
+			
+			$(".img_more").each(function(){
+				$(this).click();
+			});
+		}
+
+		if(window.opener){
+			$(".back").attr("style", "display:none;");
+		}
+		
+		// 기타화면 클릭시 메뉴 닫기
+		$("body").click(function(e){
+// 			alert("e.target.id ::: " + e.target.id);
+			if("headerGlobalMenu" != e.target.id && "headerUserName" != e.target.id && "tempSearchWord" != e.target.id) {
+				if ($('#globalMenuLayer').is(':visible')){
+					$('#globalMenuLayer').css("display", "none");
+				}
+				if ($('#globalUserMenuLayer').is(':visible')){
+					$('#globalUserMenuLayer').css("display", "none");
+				}
+			}
+		});
+		
+		
+		
+// 		// Here is the app menu click functio.
+// 		function gnbhide() {
+// 			$(".appgroup, .userinfogroup").hide();
+// 			$(".appmenu, .u_arrow").css("background-position", "left top");
+// 		};
+		
+// 		$(".appmenu").click(function() {
+// 			$(".userinfogroup").hide();
+// 			$(".u_arrow").removeClass("act");
+// 			$(".appgroup").fadeToggle();
+// 			$(this).toggleClass("act");
+// 			return false;
+// 		});
+		
+// 		// Here is the userinfo click function.
+// 		$(".userinfo").click(function() {
+// 			$(".appgroup").hide();
+// 			$(".appmenu").removeClass("act");
+// 			$(".userinfogroup").fadeToggle();
+// 			$(".u_arrow").toggleClass("act");
+// 			return false;
+// 		});
+		
+// 		// This is a function when the tab key leaves the app menu area.
+// 		$(".j_categoryall, .j_jump").focusout(function() {
+// 			$(".appgroup, .userinfogroup").slideUp(300);
+// 			$(".appmenu, .u_arrow").removeClass("act");
+// 			return false;
+// 		});
+		
+		// 로그아웃 처리
+		$("#autoPopupLayerLogout").click(function(){
+			var url = "";
+			if(dcReturnURI == null || dcReturnURI == ""){
+				url = "https://sso2.ntis.go.kr/nls3/removeAllCookies2.jsp?uurl=https://www.ntis.go.kr";
+			}else{
+				url = "https://sso2.ntis.go.kr/nls3/removeAllCookies2.jsp?uurl="+dcReturnURI;
+			}
+			document.location.href = url;
+		});
+		
+		// 통합 검색 창 포커스
+		$("#pjtSearchWord").focus(function(){
+			$(this).val("");
+		});
+		
+		$(document).mousedown(function(e){
+			// 검색어 설정
+			$('#n_searchwrap').each(function(){
+				if( $(this).css('display') != 'none' ) {
+					var l_position = $(this).offset();
+					l_position.right = parseInt(l_position.left) + parseInt($(this).width()) + 20;
+					l_position.bottom = parseInt(l_position.top) + parseInt($(this).height()) + 20;
+					
+					if( (l_position.left >= e.pageX || e.pageX >= l_position.right ) || (l_position.top >= e.pageY || e.pageY >= l_position.bottom ) ) {
+						$('#search_tab').toggle();
+						$('#n_searchwrap').slideToggle(300);
+// 						searchModeCheck = false;
+					}
+				}
+			});
+		});
+		
+		// 통합 검색 submit
+		$('#searchForm').submit(function(){
+			var searchWord = $('#pjtSearchWord').val();
+			var encodeSearchWord = encodeURIComponent(searchWord);
+			$('#searchWord').val(encodeSearchWord);
+		});
+		
+		// 동일연구책임자 수행 과제 목록 더보기
+		$("#simsPrtcpView").click(function(){
+			$(".sims_prtcp_li_none").attr("style", "display:");
+	
+			$("#simsPrtcpView").attr("style", "display:none");
+			$("#simsPrtcpClose").attr("style", "display:;margin-left:30px;");
+		});
+	
+		// 동일연구책임자 수행 과제 목록 닫기
+		$("#simsPrtcpClose").click(function(){
+			$(".sims_prtcp_li_none").attr("style", "display:none");
+	
+			$("#simsPrtcpView").attr("style", "display:;margin-left:30px;");
+			$("#simsPrtcpClose").attr("style", "display:none");
+		});
+		
+		$('#dialogMessage').dialog({
+			autoOpen: false,
+			modal: true,
+			width: 300,
+			resizable: false,
+			buttons: {
+				'확인': function() {
+					$(this).dialog('close');
+				}
+			}
+		});
+		
+		// 스크랩
+		$("#btnScrap").click(function(){
+			jConfirm("고감도 나노바이오 광센서 및 분석기술 개발을(를) 스크랩 등록하시겠습니까?<br/><br/>* 스크랩 내용은 <strong>스크랩</strong> 탭에서 확인 가능합니다.", '알림', function(confirm) {
+				if (confirm) {
+					//스크랩 등록
+					var url="/sims/exclude/insertThScrap.do";
+					var params="pjtInfoVo.pjtId="+$("#pjtId").val()+"&pjtInfoVo.userId="+$("#userId").val();
+					$.ajax({
+						type:"POST",  
+						url:url,      
+						data:params,      
+						success:function(args){
+							$("#divScrap").html(args);
+
+							var scrapYn = $("#scrapYn").val();
+
+							if(scrapYn == "Y"){
+								rtnMsg = "정상적으로 스크랩 되었습니다."
+							}else if(scrapYn == "N"){
+								rtnMsg = "스크랩 되지 않았습니다.";
+							}else{
+								rtnMsg = "중복 등록된 데이터 입니다.";
+							}
+
+							jAlert(rtnMsg, '알림', function(){});
+						},
+						error:function(e){  
+							alert(e.responseText);
+						}  
+					});
+				} else {
+					return false;
+				}				
+			});
+		});
+		
+		var url="/sims/exclude/retrieveHurimsList.do";  
+		//var url="https://www.ntis.go.kr/hurims/human/search/phr_humanList_api.mgr?pjt_id=" + pjtId;  
+		var params = "pjtInfoVo.pjtId="+'1711019127' + "&pjtInfoVo.humanType=2";
+	    $.ajax({
+	        type:"POST",  
+	        url:url,      
+	        data:params,      
+	        success:function(args){
+	        	$("#divPrtcpList").html(args);
+	        	gPrtcpCnt = $("#gPrtcpCnt").text();
+	        },
+	        error:function(e){  
+	            alert(e.responseText);
+	        }  
+	    });
+	    
+		// 연구자 더보기
+		$(document).on("click", "#btnView", function(){
+			var url="/sims/exclude/retrieveHurimsList.do";  
+		    var params="pjtInfoVo.pjtId="+pjtId + "&pjtInfoVo.humanType=1";  
+		  
+		    $.ajax({
+		        type:"POST",  
+		        url:url,      
+		        data:params,      
+		        success:function(args){
+		        	$("#divPrtcpList").html(args);	
+		        	gPrtcpCnt = $("#gPrtcpCnt").text();
+		        	
+		        	//$("#divPrtcpList").attr("style", "height:1000px; overflow-y: scroll;");
+		        },
+		        error:function(e){  
+		            alert(e.responseText);
+		        }  
+		    });  
+			
+		});
+		
+		// 연구자 더보기 닫기
+		$(document).on("click", "#btnClose", function(){
+			var url="/sims/exclude/retrieveHurimsList.do";
+		    var params="pjtInfoVo.pjtId="+pjtId;  
+		    $.ajax({
+		        type:"POST",  
+		        url:url,      
+		        data:params,      
+		        success:function(args){
+		        	$("#divPrtcpList").html(args);
+// 		        	gPrtcpCnt = $("#gPrtcpCnt").text();
+		        },
+		        error:function(e){  
+		            alert(e.responseText);
+		        }  
+		    });
+			
+			$("#divPrtcpList").scrollTop(0);
+		});
+	
+		// 계속 과제 목록 조회
+		// getContPjtList('1711019127');
+		// 동일연구책임자 수행과제 내역
+		// getPrtcpPjtList('1711019127');
+		
+		// 정보 변경 이력 조회
+		if('N' == "Y"){
+			getChngHistList('1711019127');
+		}else{
+			$("#divBtnChngHist").css("display", "none");
+		}
+		
+		// 인문사업일 경우 상세정보와 참여연구원만 표시 참여연구원 탭 위치 조정
+		
+
+		
+	
+		
+			params = "pjtInfoVo.pjtId="+pjtId;
+			new ajax.xhr.Request("/sims/exclude/retrieveOutcomeList.do",params,getOutcomeList, "POST");
+		
+		
+		// 사업명 클릭 사업 상세보기
+		$("#bzTitle").click(function(){
+			//openWinBzInfo();
+			
+			var pjConfirmYn = 'Y';
+			var stanYr 	= '2014';
+			
+			if(stanYr >= 2008){
+				if(pjConfirmYn == "N"){
+					jAlert("해당 사업의 상세정보가 존재하지 않습니다.\n\n국가연구개발사업 조사분석을 통해 확정된 사업정보에 대해서만\n상세정보가 제공됩니다.", "알림", function(){});
+					return false;
+				}
+			}
+			
+			var userId = $("#userId").val();
+			
+			var bzId 	= 'M3A9A4';
+			var dbrainBzId = '12111015015111001138401';
+			
+			if(dbrainBzId != ""){
+				bzId = dbrainBzId;
+			}
+			
+			if(userId == ""){
+				fnLogin();
+				return false;
+			}
+			
+			// 2018.02.05 박찬일 - 사업명 링크 변경 요청 (시스템게이트)	
+			// https://www.ntis.go.kr/rndgate/eg/ia/ccl/viewCycle.do?searchBzYy=사업연도&searchBzId=사업아이디&searchBzDiv=902004&searchSelectYy=사업연도 
+			//var url = "https://www.ntis.go.kr/rndgate/eg/ia/project/ProjectGroup/iaViewCycle.jsp?bz_id=" + bzId;
+			//url += "&bz_yy=" + stanYr;
+
+			var url = "https://www.ntis.go.kr/rndgate/eg/ia/ccl/viewCycle.do?searchBzYy=" + stanYr;
+			url += "&searchBzId=" + bzId;
+			url += "&searchBzDiv=902004&searchSelectYy=" + stanYr;
+			
+			openWinResize(url, 1280, 800);
+		});
+		
+		// 과제 상세정보 조회
+		$("#pjtView").click(function(){
+			//location.href="/pjtinfo/pjtMainInfo.do?pjtInfoVo.pjtId=" + '1711019127';
+			pjtView();
+		});
+		
+		// 과제구성정보 조회
+		$("#pjtConfView").click(function(){
+			pjtConfView();
+		});
+		
+		// 요약서 정보 조회
+		$("#summaryView").click(function(){
+			$("#divSummary").attr("style", "display:");
+	
+			$("#divMain").attr("style", "display:none");
+			$("#divConfPjtInfo").attr("style", "display:none");
+			$("#divPrtcp").attr("style", "display:none");
+			$("#divFner").attr("style", "display:none");
+	
+			$("#sSummaryView").attr("class", "v_tab info03 on");
+	
+			$("#sPjtView").attr("class", "v_tab info01");
+			$("#sPjtConfView").attr("class", "v_tab info02");
+			$("#sPrtcpView").attr("class", "v_tab info04");
+			$("#sFnerView").attr("class", "v_tab info05");
+		});
+		
+		// 참여연구원정보 목록 조회
+		$("#prtcpView").click(function(){
+			$("#divPrtcp").attr("style", "display:");
+	
+			$("#divMain").attr("style", "display:none");
+			$("#divConfPjtInfo").attr("style", "display:none");
+			$("#divSummary").attr("style", "display:none");
+			$("#divFner").attr("style", "display:none");
+	
+			$("#sPrtcpView").attr("class", "v_tab info04 on");
+	
+			$("#sPjtView").attr("class", "v_tab info01");
+			$("#sPjtConfView").attr("class", "v_tab info02");
+			$("#sSummaryView").attr("class", "v_tab info03");
+			$("#sFnerView").attr("class", "v_tab info05");
+		});
+		
+		// 과제 최종평가이력정보 조회
+		$("#fnerView").click(function(){
+			$("#divFner").attr("style", "display:;min-height:420px;");
+	
+			$("#divMain").attr("style", "display:none");
+			$("#divConfPjtInfo").attr("style", "display:none");
+			$("#divPrtcp").attr("style", "display:none");
+			$("#divSummary").attr("style", "display:none");
+	
+			$("#sFnerView").attr("class", "v_tab info05 on");
+	
+			$("#sPjtView").attr("class", "v_tab info01");
+			$("#sPjtConfView").attr("class", "v_tab info02");
+			$("#sSummaryView").attr("class", "v_tab info03");
+			$("#sPrtcpView").attr("class", "v_tab info04");
+		});
+	
+		// 헤더 메뉴
+		$("#headerGlobalMenu").click(function(e){
+			e.preventDefault();
+			if ($('#globalUserMenuLayer').is(':visible')){
+				$('#globalUserMenuLayer').css("display", "none");
+			}
+			$('#headerGlobalMenu').find('.appmenu').toggleClass("act");
+			$('#gnbArea').append($('#globalMenuLayer'));
+			var $ojbGlobalMenuLayer = $('#globalMenuLayer');
+// 			$ojbGlobalMenuLayer.fadeToggle();
+// 			alert("$ojbGlobalMenuLayer.html().trim() ::: " + $ojbGlobalMenuLayer.html().trim());
+			if ($ojbGlobalMenuLayer.html().trim() == '') {
+				var params = "decorator=index";
+				params += "&menuGubun=0";
+				params += "&pageCmd=pjtInfo";
+				new ajax.xhr.Request("/sims/exclude/retrieveMenu.do",params, getGlobalMenuList, "POST");
+			}else{
+				if ($('#globalMenuLayer').is(':visible')){
+// 					$('#globalMenuLayer').hide();
+					$('#globalMenuLayer').css("display", "none");
+				}else{
+// 					$('#globalMenuLayer').show();
+					$('#globalMenuLayer').css("display", "");
+				}
+// 				$('#globalMenuLayer').fadeToggle();
+// 				$(".appgroup").css("display", "");
+			}
+		});
+		
+		// 사용자 로그인 시 사용자 메뉴
+		$("#headerUserName").click(function(e){
+			e.preventDefault();
+			if ($('#globalMenuLayer').is(':visible')){
+				$('#globalMenuLayer').css("display", "none");
+			}
+			$('#headerUserName').find('.u_arrow').toggleClass("act");
+			$('#gnbArea').append($('#globalUserMenuLayer'));
+			var $ojbGlobalUserMenuLayer = $('#globalUserMenuLayer');
+			if ($ojbGlobalUserMenuLayer.html().trim() == '') {
+				var params = "pjtInfoVo.pjtId="+'1711019127';
+				params += "&menuGubun=1";
+				params += "&pageCmd=pjtInfo";
+				new ajax.xhr.Request("/sims/exclude/retrieveMenu.do",params, getUserMenuList, "POST");
+			}else{
+				if ($('#globalUserMenuLayer').is(':visible')){
+// 					$('#globalUserMenuLayer').hide();
+					$('#globalUserMenuLayer').css("display", "none");
+				}else{
+// 					$('#globalUserMenuLayer').show();
+					$('#globalUserMenuLayer').css("display", "");
+				}
+// 				$('#globalUserMenuLayer').fadeToggle();
+// 				$(".userinfogroup").css("display", "");
+			}
+		});
+		
+		// 로그인
+		$("#login").click(function(){
+			fnLogin();
+		});
+		
+		// 이전 목록 이동
+		$("#btnList").click(function(){
+			// 2017.12.28 조우승 연구원 요청 (뒤로 가기로 변경)
+			/*
+			if(dcReturnURI == null || dcReturnURI == ""){
+				location.href = 'https://www.ntis.go.kr';
+			}else{
+				location.href= dcReturnURI;
+			}
+			*/
+			history.back();
+		});
+		
+		// NTIS 홈 이동
+		$("#ntisHome").click(function(){
+			location.href = "https://www.ntis.go.kr";
+		});
+		
+		// 과제상세검색
+		$("#btnDtlSearch").click(function(){
+			location.href = "https://www.ntis.go.kr/ThFastSearchAdvanced.do";
+		});
+		
+		
+		var loginId = '';
+		// 로그인 여부 설정
+		if(loginId != null && loginId != ""){
+			$("#loginYn").val("1");
+		}else{
+			$("#loginYn").val("");
+		}
+		
+		// 로그인 사용자 자동 로그아웃 Layer Popup
+		if ($('#loginYn').val() == '1') {
+			// 사용자로부터 화면 이동 이벤트가 없을경우 
+			// 자동로그아웃까지의 대기시간 : 분단위 
+			var iMinute = 30;
+			// 자동로그아웃 처리 몇초전에 경고를 보여줄지 설정하는 부분 : 초단위 
+			var noticeSecond = 60; 
+			var iSecond = iMinute * 60 ; 
+			var timerchecker = null; 
+			initTimer = function() { 
+				var rMinute = parseInt(iSecond / 60); 
+				var rSecond = iSecond % 60; 
+				if(iSecond > 0) {
+					// 지정한 시간동안 화면 이동 이벤트가 발생되지 않았을 경우
+					if(iSecond < noticeSecond) {
+						$("#divLogOutLayer").css("display", "");
+						$('#autoLogoutLayer').popup({
+							type: 'overlay',
+							opacity: 0.7,
+							scrolllock: true,
+							blur: false
+						}).popup('show');
+					}
+					
+					// 자동로그아웃 경고레이어에 경고문+남은 시간 보여주는 부분 
+					$('#timer').text(Lpad(rMinute, 2) + ':' + Lpad(rSecond, 2) + ' 초');
+					iSecond--; 
+					timerchecker = setTimeout("initTimer()", 1000); // 1초 간격으로 체크 
+				} else {
+					clearTimeout(timerchecker); 
+	
+					// 로그아웃 처리 페이지 
+					var url = "";
+					if(dcReturnURI == null || dcReturnURI == ""){
+						url = "https://sso2.ntis.go.kr/nls3/removeAllCookies2.jsp?uurl=https://www.ntis.go.kr";
+					}else{
+						url = "https://sso2.ntis.go.kr/nls3/removeAllCookies2.jsp?uurl="+dcReturnURI;
+					}
+					document.location.href = url;
+				}
+			};
+			onload = initTimer;
+		};
+		
+// 		$(window).resize(function() {
+// 			//alert($('#bodyContentArea').height());
+// 			//alert(window.innerHeight);
+			
+// 			// 본문 내용이 화면 사이즈 보다 작을 경우 Footer 이동
+// 			if ($('#bodyContentArea').height() < (window.innerHeight-45)) {
+// 				$('.globalFoot').css({
+// 					'position':'absolute',
+// 					'bottom':'0px'
+// 				});
+// 			} else {
+// 				$('.globalFoot').removeAttr('style');
+// 			}
+// 		});
+		
+// 		$(function(){
+// 			// 본문 내용이 화면 사이즈 보다 작을 경우 Footer 이동
+// 			if ($('#bodyContentArea').height() < (window.innerHeight-45)) {
+// 				$('.globalFoot').css({
+// 					'position':'absolute',
+// 					'bottom':'0px'
+// 				});
+// 			}
+// 		});
+		
+		// 계속과제목록 더보기
+		$("#simsContView").click(function(){
+			$(".sims_cont_li_none").attr("style", "display:");
+	
+			$("#simsContView").attr("style", "display:none");
+			$("#simsContClose").attr("style", "display:;margin-left:30px;");
+		});
+	
+		// 계속과제목록 닫기
+		$("#simsContClose").click(function(){
+			$(".sims_cont_li_none").attr("style", "display:none");
+	
+			$("#simsContView").attr("style", "display:;margin-left:30px;");
+			$("#simsContClose").attr("style", "display:none");
+		});
+	
+		// 로그인 연장하기
+		$("#autoPopupContinueLogin").click(function(){
+			var url = "https://www.ntis.go.kr/sims/pjtinfo/pjtMainInfo.do?pjtInfoVo.pjtId=1711019127";
+	
+			document.location.href = url;
+		});
+		
+		// 닫기
+		$("#btnPjtClose").click(function(){
+			window.close();
+		});
+	
+		// 위탁과제정보 내려받기
+		$("#btnCmDown").click(function(){
+			$("#cmdType").val("down");
+			$("#downType").val("cm");
+	
+			$("#fmPjtInfo").submit();
+		});
+	
+		// 공동연구정보 내려받기
+		$("#btnCoDown").click(function(){
+			$("#cmdType").val("down");
+			$("#downType").val("co");
+	
+			$("#fmPjtInfo").submit();
+		});
+		
+		// 정보변경이력 조회
+		$("#btnChngHist").click(function(){
+			// var url = "http://www1.ntis.go.kr/ThCommonChngHistList.do?searchKey=1711019127";
+			
+			// openPopUpWin(url, 1080, 800, "과제 정보변경이력");
+			
+			$("#changePopup").css("display", "block");
+		});
+		
+		if(gBzClasCd == "23401"){
+			$("#divBtnChngHist").css("margin-top", "-22px");
+		}
+	});
+	
+</script>
+
+<script type="text/javascript">
+	//spinner 작동을 위한 초기화 Start (공통 헤더부분에 추가하시면 될 것 같습니다.)
+	var opts =
+	{
+	    lines : 12, // The number of lines to draw
+	    length : 60, // The length of each line
+	    width : 15, // The line thickness
+	    radius : 40, // The radius of the inner circle
+	    corners : 1, // Corner roundness (0..1)
+	    rotate : 0, // The rotation offset
+	    color : 'black', // #rgb or #rrggbb
+	    speed : 1, // Rounds per second
+	    trail : 60, // Afterglow percentage
+	    shadow : false, // Whether to render a shadow
+	    hwaccel : false, // Whether to use hardware acceleration
+	    className : 'spinner', // The CSS class to assign to the spinner
+	    zIndex : 2e9, // The z-index (defaults to 2000000000)
+	    top : 'auto', // Top position relative to parent in px
+	    left : 'auto' // Left position relative to parent in px
+	};
+	
+	$.fn.spin = function(opts) {
+		   this.each(function() {
+		    var $this = $(this), data = $this.data();
+		   if (data.spinner) {
+		     data.spinner.stop();
+		     delete data.spinner;
+		    }
+		    if (opts !== false) {
+		     data.spinner = new Spinner($.extend({color: $this.css('color')}, opts)).spin(this);
+		    }
+		   });
+		   return this;
+	};
+	// spinner 작동을 위한 초기화 End
+</script>
+
+<script type="text/javascript" src="/sims/common/js/th/spin.js"></script>
+<script type="text/javascript" src="/sims/common/ajax.js"></script>
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	
+	<style type="text/css">
+		.img_close, .img_more{
+			cursor: pointer;
+			vertical-align: middle;
+		}
+	</style>
+
+	<script type="text/javascript">
+		$(document).ready(function(){			
+			$("input:checkbox").attr("style", "vertical-align: middle;");
+			
+			$("input:checkbox").click(function(){
+				return false;
+			});
+			
+			// 참여연구원 목록 상세조회
+			/*
+			$(document).on("click", "#tbPrtcp a", function(){
+				hurimsDetainInfo($(this).attr("hmId"));
+			});
+			*/
+			
+			// 위탁과제 참여연구원 인력 상세
+			/*
+			$(document).on("click", "#tbCmPrtcp a", function(){
+				hurimsDetainInfo($(this).attr("rRno"));
+			});
+			*/
+			
+			// 공동연구 참여연구원 인력 상세
+			/*
+			$(document).on("click", "#tbCoPrtcp a", function(){
+				hurimsDetainInfo($(this).attr("rRno"));
+			});
+			*/
+			
+			// 과제구성정보 주관 및 협동과제의 연구책임자 인력 상세
+			/*
+			$("#tbConfPjtInfo tr:gt(0) td:nth-child(3) a").click(function(){
+				hurimsDetainInfo($(this).attr("hmId"));
+			});
+			*/
+
+			// 총연구비 및 세부내역 더보기
+			$("#simsAmtView").click(function(){
+				$("#tbAmt .trAdd").css("display", "");
+
+				$(".seltc").css("background-color", "#FFD7C8;");
+				$(".seltr").css("background-color", "#FFD7C8;");
+
+				$("#simsAmtClose").css("display", "");
+				$("#simsAmtView").css("display", "none");
+			});
+
+			// 총연구비 및 세부내역 닫기
+			$("#simsAmtClose").click(function(){
+				$("#tbAmt .trAdd").css("display", "none");
+
+				$(".seltc").css("background-color", "#fff;");
+				$(".seltr").css("background-color", "#fff;");
+
+				$("#simsAmtClose").css("display", "none");
+				$("#simsAmtView").css("display", "");
+			});
+			
+			// 평가등급 팝업
+			$("#btnAssmtPop").click(function(){
+				var url = "/sims/pjtFnerCodeList.do?decorator=popup";
+				url += "&cmdType=1";
+				url += "&pjtId="+'1711019127';
+				url += "&srcOrgId="+'';
+				url += "&pjtFinalAssmtGrdNm="+ encodeURI(encodeURI(''));
+
+				openMainPopUpWin(url, 600, 600, "평가등급 팝업");
+			});
+			
+			// 과제중단유형 팝업
+			$("#btnStopTypePop").click(function(){
+				var url = "/sims/pjtFnerCodeList.do?decorator=popup";
+				url += "&cmdType=2";
+				url += "&pjtId="+'1711019127';
+				url += "&srcOrgId="+'';
+				url += "&pjtStopTypeCd="+'';
+				url += "&pjtStopRsonCd="+'';
+
+				openMainPopUpWin(url, 600, 600, "과제중단유형 팝업");
+			});
+
+			// 과제중단사유 팝업
+			$("#btnStopRsonPop").click(function(){
+				var url = "/sims/pjtFnerCodeList.do?decorator=popup";
+				url += "&cmdType=3";
+				url += "&pjtId="+'1711019127';
+				url += "&srcOrgId="+'';
+
+				openMainPopUpWin(url, 600, 600, "과제중단사유 팝업");
+			});
+		});
+
+		function fnRschMgntView(hmId){
+			hurimsDetainInfo(hmId);
+		}
+
+		// 팝업 오픈
+		function openMainPopUpWin(url, w, h, popName){
+			cw = w;
+			ch = h;
+			
+			sw = screen.availWidth;
+			sh = screen.availHeight;
+			
+			px = (sw-cw)/2;
+			py = (sh-ch)/2;
+			
+			window.open(url, popName, "scrollbars=yes, status=no, menu=no, resizable=no, left="+px+", top="+py+", width="+cw+", height="+ch);
+		}
+		
+		// 인력정보 상세보기
+		function hurimsDetainInfo(hrstKoi){
+			if(hrstKoi == null || hrstKoi.trim() == ""){
+				alert("인력정보가 부족하여 상세 조회를 할 수 없습니다.");
+				return false;
+			}
+
+			var url = "https://www.ntis.go.kr/hurims/detail/selectDetailInfo.do?hrstKOI=" + hrstKoi;
+			url += "&apiGb=true&pjtId="+'1711019127';
+			url += "&returnURI=" + '';
+
+			window.location.href = url;
+		}
+		
+		// 세부과제의 위탁과제 및 공동연구정보 목록 보기
+		function viewCmCoList(pjtId){
+			$("#tr" + pjtId).attr("style","display:");
+
+			$("#" + pjtId + "close").attr("style","display:");
+			$("#" + pjtId + "more").attr("style","display:none");
+		}
+		
+		// 세부과제의 위탁과제 및 공동연구정보 목록 닫기
+		function closeCmCoList(pjtId){
+			$("#tr" + pjtId).attr("style","display:none");
+
+			$("#" + pjtId + "close").attr("style","display:none");
+			$("#" + pjtId + "more").attr("style","display:");
+		}
+		
+		// 평가위원 부처별 분야분류 팝업
+		function fnDeptClsNm(asesorNtisSn){
+			var url = "/sims/pjtAsesorDeptClsList.do?decorator=popup";
+			url += "&pjtId="+'1711019127';
+			url += "&asesorNtisSn="+ asesorNtisSn;
+
+			openMainPopUpWin(url, 600, 500, "평가위원 부처별 분야분류 팝업");
+		}
+	</script>
+
+</head>
+<body id="searchmain">
+	
+	
+				
+	
+</body>
+</html>
